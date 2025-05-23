@@ -1,44 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { NewTodoDtoDto } from '../dto/NewTodoDto.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Todo } from '../model/todo.entity';
+import { Repository } from 'typeorm';
 import { UpdateTodoDto } from '../dto/UpdateTodoDto.dto';
-import { SqliteService } from '../../db_init/sqlite.service';
 
 @Injectable()
 export class TodoService {
-  constructor(private readonly sqliteService: SqliteService) {}
+  constructor(
+    @InjectRepository(Todo)
+    private todoRepository: Repository<Todo>,
+  ) {
+  }
 
   create(todoDto: NewTodoDtoDto) {
-    return new Promise((resolve, reject) => {
-      this.sqliteService.db.run(
-        'INSERT INTO todos (title) VALUES (?)',
-        [todoDto.title],
-        function (err) {
-          if (err) reject(err);
-          else resolve({ id: this.lastID, ...todoDto});
-        },
-      );
-    });
+    const todo = this.todoRepository.create(todoDto);
+    return this.todoRepository.save(todo);
   }
 
   findAllTodo() {
-    return new Promise((resolve, reject) => {
-      this.sqliteService.db.all('SELECT * FROM todos', function (err, rows) {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
+    return this.todoRepository.find();
   }
 
   findById(id: number) {
-    // return this.todoRepository.findOneBy({ id });
+    return this.todoRepository.findOneBy({ id });
   }
 
   removeById(id: number) {
-    // return this.todoRepository.delete(id);
+    return this.todoRepository.delete(id);
   }
 
   async updateById(id: number, dto: UpdateTodoDto) {
-    // await this.todoRepository.update(id, dto);
-    // return this.todoRepository.findOneBy({ id });
+    await this.todoRepository.update(id, dto);
+    return this.todoRepository.findOneBy({ id });
   }
 }

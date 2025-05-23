@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TodoModule } from './todo/todo.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    // TypeORM
-    // TypeOrmModule.forRoot({
-    //   type: 'sqlite',
-    //   database: './database.sqlite',
-    //   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    //   synchronize: true,
-    // }),
+    TypeOrmModule.forRoot({
+      type: 'sqlite',
+      database: './database.sqlite',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
     TodoModule,
   ],
 })
